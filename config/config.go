@@ -22,6 +22,7 @@ type Config struct {
 	SmtpPass   string
 	SmtpHeader string
 	Smtp       *gomail.Dialer
+	StaticPath string
 }
 
 func Init() error {
@@ -33,6 +34,7 @@ func Init() error {
 	Env.Sender = os.Getenv("EMAIL_SENDER")
 	Env.SmtpHost = os.Getenv("EMAIL_HOST")
 	Env.SmtpPass = os.Getenv("EMAIL_PASS")
+	Env.StaticPath = os.Getenv("STATIC_PATH")
 
 	d := gomail.NewDialer(Env.SmtpHost, 587, Env.Sender, Env.SmtpPass)
 	Env.Smtp = d

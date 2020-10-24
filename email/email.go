@@ -33,7 +33,7 @@ func SendRecepients(recepients []string, subject string, body string) error {
 
 	// generate fileName
 	now := time.Now()
-	fileName := fmt.Sprintf("static/%d.txt", now.Unix())
+	fileName := fmt.Sprintf("%s/%d.txt", config.Env.StaticPath, now.Unix())
 	fmt.Println(fileName)
 
 	err := writeToFile(fileName, body)
