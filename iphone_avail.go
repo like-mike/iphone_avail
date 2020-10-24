@@ -13,11 +13,13 @@ import (
 func main() {
 	err := config.Init()
 	if err != nil {
+		_ = email.SendRecepients(0, config.Env.ErrorRecepients, "Error", err.Error())
 		log.Fatal(err)
 	}
 
 	items, err := item.GetItems()
 	if err != nil {
+		_ = email.SendRecepients(0, config.Env.ErrorRecepients, "Error", err.Error())
 		log.Fatal(err)
 	}
 
