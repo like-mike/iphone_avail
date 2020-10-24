@@ -91,7 +91,7 @@ func CheckAvail(jobID int64, item *item.Item, errCh chan<- error) {
 			}
 		}
 
-		if inv[item.Serial].StoreSelectionEnabled != true {
+		if inv[item.Serial].StoreSelectionEnabled {
 			availableStores = append(availableStores, inv[item.Serial])
 		}
 	}
