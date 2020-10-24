@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"time"
 
 	"github.com/like-mike/iphone_avail/config"
 	"gopkg.in/gomail.v2"
@@ -17,10 +16,7 @@ func send(recepient string, subject string, body string, fileName string) error 
 	m.SetHeader("To", recepient)
 
 	m.SetHeader("Subject", subject)
-
-	if fileName != "" {
-		m.Attach(fileName)
-	}
+	m.Attach(fileName)
 
 	if err := config.Env.Smtp.DialAndSend(m); err != nil {
 		return err
@@ -29,11 +25,9 @@ func send(recepient string, subject string, body string, fileName string) error 
 	return nil
 }
 
-func SendRecepients(recepients []string, subject string, body string) error {
+func SendRecepients(jobID int64, recepients []string, subject string, body string) error {
 
-	// generate fileName
-	now := time.Now()
-	fileName := fmt.Sprintf("%s/%d.txt", config.Env.StaticPath, now.Unix())
+	fileName := fmt.Sprintf("%s/%d.txt", config.Env.StaticPath, config.Env.RunID+jobID)
 	fmt.Println(fileName)
 
 	err := writeToFile(fileName, body)
@@ -49,11 +43,9 @@ func SendRecepients(recepients []string, subject string, body string) error {
 		}
 	}
 
-	if fileName != "" {
-		err := os.Remove(fileName)
-		if err != nil {
-			return err
-		}
+	err = os.Remove(fileName)
+	if err != nil {
+		return err
 	}
 
 	return nil

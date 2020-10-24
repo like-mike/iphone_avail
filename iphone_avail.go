@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/like-mike/iphone_avail/item"
+
 	"github.com/like-mike/iphone_avail/check_avail"
 	"github.com/like-mike/iphone_avail/config"
 	"github.com/like-mike/iphone_avail/email"
@@ -14,19 +16,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	errCh := make(chan error, 2)
+	items, err := item.GetItems()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	go check_avail.CheckAvail("MGLP3LL/A", "UNLOCKED/US", 97035, errCh) // Silver 128GB - Unlocked
-	go check_avail.CheckAvail("MGKH3LL/A", "TMOBILE/US", 97035, errCh)  // Silver 128gb - TMO
+	errCh := make(chan error, len(items))
 
-	// go check_avail.CheckAvail("MGKU3LL/A", "TMOBILE/US", 98031, errCh) // Blue 512gb - TMO
+	for i, item := range items {
+		go check_avail.CheckAvail(int64(i), &item, errCh)
+	}
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < len(items); i++ {
 		select {
 		case err = <-errCh:
 			if err != nil {
 				log.Printf("Error: %s\n", err.Error())
-				_ = email.SendRecepients(config.Env.Recepients, "Error", err.Error())
+				_ = email.SendRecepients(int64(len(items))+1, config.Env.ErrorRecepients, "Error", err.Error())
 			}
 		}
 	}

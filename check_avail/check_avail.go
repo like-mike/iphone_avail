@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/like-mike/iphone_avail/item"
+
 	"github.com/like-mike/iphone_avail/config"
 	"github.com/like-mike/iphone_avail/email"
 )
@@ -29,12 +31,17 @@ type PickupStorePartsAvailability struct {
 	StorePickupProductTitle string `json:"storePickupProductTitle"`
 }
 
-func CheckAvail(serial string, carrier string, zipCode int, errCh chan<- error) {
+func CheckAvail(jobID int64, item *item.Item, errCh chan<- error) {
+
+	// if true {
+	// 	errCh <- fmt.Errorf("This is an error")
+	// 	return
+	// }
 
 	url := fmt.Sprintf(`https://www.apple.com/shop/retail/pickup-message?pl=true&cppart=%s&parts.0=%s&location=%d`,
-		carrier,
-		serial,
-		zipCode,
+		item.Carrier,
+		item.Serial,
+		item.Zip,
 	)
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -84,21 +91,19 @@ func CheckAvail(serial string, carrier string, zipCode int, errCh chan<- error) 
 			}
 		}
 
-		if inv[serial].StoreSelectionEnabled == true {
-			availableStores = append(availableStores, inv[serial])
+		if inv[item.Serial].StoreSelectionEnabled == true {
+			availableStores = append(availableStores, inv[item.Serial])
 		}
 	}
 
 	if len(availableStores) > 0 {
-		// build subject
-
 		body := fmt.Sprintf("%s (%d stores)\n\n", availableStores[0].StorePickupProductTitle, len(availableStores))
 		for _, store := range availableStores {
 			body += fmt.Sprintf("%s is Avaiable %s \n", store.StorePickupProductTitle, store.StorePickupQuote)
 		}
 
 		// send email
-		err = email.SendRecepients(config.Env.Recepients, "In Stock", body)
+		err = email.SendRecepients(jobID, config.Env.Recepients, "In Stock", body)
 		if err != nil {
 			errCh <- err
 			return
