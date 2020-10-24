@@ -29,7 +29,7 @@ type PickupStorePartsAvailability struct {
 	StorePickupProductTitle string `json:"storePickupProductTitle"`
 }
 
-func CheckAvail(serial string, carrier string, zipCode int, errCh chan error) {
+func CheckAvail(serial string, carrier string, zipCode int, errCh chan<- error) {
 
 	url := fmt.Sprintf(`https://www.apple.com/shop/retail/pickup-message?pl=true&cppart=%s&parts.0=%s&location=%d`,
 		carrier,
@@ -92,14 +92,13 @@ func CheckAvail(serial string, carrier string, zipCode int, errCh chan error) {
 	if len(availableStores) > 0 {
 		// build subject
 
-		subject := fmt.Sprintf("%s (%d stores)", availableStores[0].StorePickupProductTitle, len(availableStores))
-		body := ""
+		body := fmt.Sprintf("%s (%d stores)\n\n", availableStores[0].StorePickupProductTitle, len(availableStores))
 		for _, store := range availableStores {
-			body += fmt.Sprintf("%s is Avaiable %s //<br>", store.StorePickupProductTitle, store.StorePickupQuote)
+			body += fmt.Sprintf("%s is Avaiable %s \n", store.StorePickupProductTitle, store.StorePickupQuote)
 		}
 
 		// send email
-		err = email.SendRecepients(config.Env.Recepients, subject, body)
+		err = email.SendRecepients(config.Env.Recepients, "In Stock", body)
 		if err != nil {
 			errCh <- err
 			return
