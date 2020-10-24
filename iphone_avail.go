@@ -14,14 +14,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	errCh := make(chan error, 3)
+	errCh := make(chan error, 2)
 
-	go check_avail.CheckAvail("MGLP3LL/A", "UNLOCKED/US", 98031, errCh) // Silver 128GB - Unlocked
-	go check_avail.CheckAvail("MGKH3LL/A", "TMOBILE/US", 98031, errCh)  // Silver 128gb - TMO
+	go check_avail.CheckAvail("MGLP3LL/A", "UNLOCKED/US", 97035, errCh) // Silver 128GB - Unlocked
+	go check_avail.CheckAvail("MGKH3LL/A", "TMOBILE/US", 97035, errCh)  // Silver 128gb - TMO
 
-	go check_avail.CheckAvail("MGKU3LL/A", "TMOBILE/US", 98031, errCh) // Blue 512gb - TMO
+	// go check_avail.CheckAvail("MGKU3LL/A", "TMOBILE/US", 98031, errCh) // Blue 512gb - TMO
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 2; i++ {
 		select {
 		case err = <-errCh:
 			if err != nil {
