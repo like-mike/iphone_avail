@@ -31,7 +31,7 @@ type PickupStorePartsAvailability struct {
 	StorePickupProductTitle string `json:"storePickupProductTitle"`
 }
 
-func CheckAvail(jobID int64, item *item.Item, errCh chan<- error) {
+func CheckAvail(jobID int64, item item.Item, errCh chan<- error) {
 
 	// if true {
 	// 	errCh <- fmt.Errorf("This is an error")

@@ -26,7 +26,7 @@ func main() {
 	errCh := make(chan error, len(items))
 
 	for i, item := range items {
-		go check_avail.CheckAvail(int64(i), &item, errCh)
+		go check_avail.CheckAvail(int64(i), item, errCh)
 	}
 
 	for i := 0; i < len(items); i++ {
