@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"fmt"
 	"gopkg.in/gomail.v2"
 )
 
@@ -33,7 +34,12 @@ func Init() error {
 
 	Env.Ctx = context.Background()
 
-	Env.Recepients = strings.Split(os.Getenv("EMAIL_RECEPIENTS"), ",")
+	emailRecepients := os.Getenv("EMAIL_RECEPIENTS")
+	if emailRecepients == "" {
+		return fmt.Errorf("No recepients")
+	}
+	Env.Recepients = strings.Split(emailRecepients, ",")
+	//fmt.Println(Env.Recepients)
 	Env.ErrorRecepients = strings.Split(os.Getenv("ERROR_RECEPIENTS"), ",")
 	Env.Sender = os.Getenv("EMAIL_SENDER")
 	Env.SmtpHost = os.Getenv("EMAIL_HOST")
